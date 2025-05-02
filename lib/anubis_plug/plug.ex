@@ -2,6 +2,11 @@
 defmodule AnubisPlug do
   import Plug.Conn
   
+  @policies (
+    {module, function} = Application.compile_env(:anubis_plug, :policies)
+    apply(module, function, [])
+  )
+  
   def init(opts), do: opts
   
   def call(conn, _opts) do
@@ -43,8 +48,7 @@ defmodule AnubisPlug do
   end
   
   defp matches_policy?(user_agent, type) do
-    policies = Application.get_env(:anubis_plug, :policies, %{})
-    policy = Map.get(policies, type)
+    policy = Map.get(@policies, type)
     AnubisPlug.Policy.match?(policy, user_agent)
   end
 end
