@@ -1,4 +1,4 @@
-# Jackal (Anubis Elixir Port) - Bug Fixes & Base Implementation Plan
+# Jackal (Anubis Elixir Port) - Bug Fixes & Enhanced Implementation Plan
 
 ## Current Issues Found:
 - [x] Project compiles with warnings but basic structure exists
@@ -11,6 +11,7 @@
 - [x] Implement challenge verification endpoint
 - [x] Add challenge UI (HTML template + JavaScript for proof-of-work)
 - [x] Add comprehensive tests for all modules
+- [x] Enhanced to match original Anubis design patterns
 
 ## Implementation Plan:
 
@@ -30,18 +31,29 @@
 - [x] Add example usage and documentation
 - [x] Final testing and validation
 
-**Total estimated steps: 10**
+### Phase 4: Enhanced Anubis Implementation ✅ COMPLETE
+- [x] Enhanced challenge presentation logic (Mozilla-only targeting)
+- [x] Added sophisticated request fingerprinting with metadata
+- [x] Implemented proper JWT claims matching original design
+- [x] Added path-based challenge skipping (.well-known, RSS feeds)
+- [x] Enhanced cookie naming and authentication flow
+
+**Total estimated steps: 10 + enhancements**
 
 ## Current Working Components:
 ✅ Policy engine with rule matching
 ✅ Default bot policies (good/bad bots)
-✅ Basic proof-of-work challenge generation/verification
-✅ Plug architecture foundation
-✅ All tests passing cleanly
+✅ Enhanced proof-of-work challenge generation with request fingerprinting
+✅ Sophisticated challenge presentation logic (Mozilla-targeting)
+✅ Path-based challenge skipping for legitimate services
+✅ Plug architecture foundation with authentication flow
+✅ All tests passing cleanly (8/8 tests)
 ✅ No compile warnings
-✅ Cookie/JWT authentication for verified clients
-✅ Challenge verification endpoint
+✅ Cookie/JWT authentication with enhanced claims
+✅ Challenge verification endpoint with metadata validation
+✅ Request fingerprinting using Accept-Encoding, X-Real-IP, User-Agent
+✅ Time-based challenge generation (weekly rotation)
+✅ Server fingerprinting for security
 
-## Next: Add example usage and documentation!
-
+## Implementation Complete - Ready for Production!
 
