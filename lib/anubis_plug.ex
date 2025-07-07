@@ -43,7 +43,7 @@ defmodule AnubisPlug do
 
     cond do
       # Only challenge User-Agents containing "Mozilla"
-      not String.contains?(String.downcase(user_agent), "mozilla") ->
+      user_agent != "" and not String.contains?(String.downcase(user_agent), "mozilla") ->
         true
 
       # Skip well-known paths
