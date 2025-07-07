@@ -76,7 +76,7 @@ defmodule AnubisPlug do
   end
 
   defp issue_challenge(conn) do
-    {nonce, target} = AnubisPlug.Challenge.generate()
+    {nonce, target, challenge_string} = AnubisPlug.Challenge.generate(conn)
 
     conn
     |> put_resp_content_type("application/json")
@@ -85,7 +85,8 @@ defmodule AnubisPlug do
       Jason.encode!(%{
         status: "challenge",
         nonce: nonce,
-        target: target
+        target: target,
+        challenge: challenge_string
       })
     )
     |> halt()
