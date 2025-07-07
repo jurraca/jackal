@@ -1,6 +1,7 @@
 defmodule AnubisPlugTest do
   use ExUnit.Case, async: true
-  use Plug.Test
+  import Plug.Test
+  import Plug.Conn
 
   describe "AnubisPlug" do
     test "allows good bots" do
