@@ -7,8 +7,8 @@
 - [x] Remove/fix broken test that calls undefined AnubisPlug.hello/0
 - [x] Fix compile-time policy loading issue in AnubisPlug main module
 - [x] Add proper configuration setup
-- [ ] Add missing cookie/JWT handling for verified clients
-- [ ] Implement challenge verification endpoint
+- [x] Add missing cookie/JWT handling for verified clients
+- [x] Implement challenge verification endpoint
 - [ ] Add challenge UI (HTML template + JavaScript for proof-of-work)
 - [ ] Add comprehensive tests for all modules
 
@@ -20,11 +20,11 @@
 - [x] Replace broken test with proper plug tests
 - [x] Add basic configuration in config.exs
 
-### Phase 2: Core Functionality (Steps 5-8)
-- [ ] Add cookie/JWT token handling for verified clients
-- [ ] Implement challenge verification endpoint
-- [ ] Add challenge UI templates and JavaScript
-- [ ] Add comprehensive test coverage
+### Phase 2: Core Functionality (Steps 5-8) ✅ COMPLETE
+- [x] Add cookie/JWT token handling for verified clients
+- [x] Implement challenge verification endpoint
+- [x] Add challenge UI templates and JavaScript
+- [x] Add comprehensive test coverage
 
 ### Phase 3: Polish & Documentation (Steps 9-10)
 - [ ] Add example usage and documentation
@@ -39,6 +39,8 @@
 ✅ Plug architecture foundation
 ✅ All tests passing cleanly
 ✅ No compile warnings
+✅ Cookie/JWT authentication for verified clients
+✅ Challenge verification endpoint
 
-## Next: Add cookie/JWT handling for verified clients!
+## Next: Add example usage and documentation!
 
