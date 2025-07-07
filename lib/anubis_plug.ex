@@ -4,6 +4,27 @@ defmodule AnubisPlug do
   def init(opts), do: opts
 
   def call(conn, _opts) do
+    # First check if the client has a valid auth token
+    case check_auth_token(conn) do
+      :valid -> conn
+      :invalid -> proceed_with_bot_verification(conn)
+    end
+  end
+
+  defp check_auth_token(conn) do
+    case AnubisPlug.Auth.get_auth_token(conn) do
+      nil ->
+        :invalid
+
+      token ->
+        case AnubisPlug.Auth.verify_token(token) do
+          {:ok, _payload} -> :valid
+          {:error, _reason} -> :invalid
+        end
+    end
+  end
+
+  defp proceed_with_bot_verification(conn) do
     case verify_bot(conn) do
       :allow -> conn
       :block -> deny_access(conn)
