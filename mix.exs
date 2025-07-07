@@ -1,10 +1,9 @@
-
-defmodule AnubisPlug.MixProject do
+defmodule Jackal.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :anubis_plug,
+      app: :jackal,
       version: "0.1.0",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +14,7 @@ defmodule AnubisPlug.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {AnubisPlug.Application, []}
+      mod: {Jackal.Application, []}
     ]
   end
 

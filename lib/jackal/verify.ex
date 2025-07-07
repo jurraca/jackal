@@ -1,4 +1,4 @@
-defmodule AnubisPlug.Verify do
+defmodule Jackal.Verify do
   @moduledoc """
   Handles challenge verification and token issuance
   """
@@ -42,15 +42,15 @@ defmodule AnubisPlug.Verify do
   end
 
   defp verify_solution(conn, nonce, solution) do
-    if AnubisPlug.Challenge.verify(nonce, solution) do
+    if Jackal.Challenge.verify(nonce, solution) do
       token =
-        AnubisPlug.Auth.generate_token(%{
+        Jackal.Auth.generate_token(%{
           user_agent: get_user_agent(conn),
           verified_at: System.system_time(:second)
         })
 
       conn
-      |> AnubisPlug.Auth.set_auth_cookie(token)
+      |> Jackal.Auth.set_auth_cookie(token)
       |> put_resp_content_type("application/json")
       |> send_resp(200, Jason.encode!(%{status: "verified", token: token}))
       |> halt()

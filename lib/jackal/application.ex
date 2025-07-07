@@ -1,4 +1,4 @@
-defmodule AnubisPlug.Application do
+defmodule Jackal.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,13 +8,13 @@ defmodule AnubisPlug.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: AnubisPlug.Worker.start_link(arg)
-      # {AnubisPlug.Worker, arg}
+      # Starts a worker by calling: Jackal.Worker.start_link(arg)
+      # {Jackal.Worker, arg}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: AnubisPlug.Supervisor]
+    opts = [strategy: :one_for_one, name: Jackal.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

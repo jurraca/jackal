@@ -1,5 +1,5 @@
 
-defmodule AnubisPlug.Policy do
+defmodule Jackal.Policy do
   @moduledoc """
   Defines policies for bot classification and handling
   """

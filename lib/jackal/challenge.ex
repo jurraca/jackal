@@ -1,11 +1,11 @@
-defmodule AnubisPlug.Challenge do
+defmodule Jackal.Challenge do
   @moduledoc """
   Implements proof of work challenge generation and verification with enhanced
   fingerprinting based on the original Anubis design
   """
 
   def generate(conn \\ nil) do
-    difficulty = Application.get_env(:anubis_plug, :challenge_difficulty, 4)
+    difficulty = Application.get_env(:jackal, :challenge_difficulty, 4)
 
     if conn do
       # Generate challenge string based on request metadata (original Anubis style)
@@ -20,7 +20,7 @@ defmodule AnubisPlug.Challenge do
   end
 
   def verify(nonce, solution, challenge_string \\ nil) do
-    difficulty = Application.get_env(:anubis_plug, :challenge_difficulty, 4)
+    difficulty = Application.get_env(:jackal, :challenge_difficulty, 4)
 
     input =
       if challenge_string do
@@ -78,7 +78,7 @@ defmodule AnubisPlug.Challenge do
   defp get_server_fingerprint do
     # Simplified server fingerprint - in production this could be based on
     # a persistent ED25519 key as in original Anubis
-    app_name = Application.get_env(:anubis_plug, :app_name, "anubis_plug")
+    app_name = Application.get_env(:jackal, :app_name, "jackal")
     :crypto.hash(:sha256, app_name) |> Base.encode16(case: :lower) |> String.slice(0, 16)
   end
 

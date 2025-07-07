@@ -4,8 +4,8 @@
 - [x] Project compiles with warnings but basic structure exists
 - [x] Fix @difficulty undefined module attribute bug in Challenge.generate/0
 - [x] Fix unused difficulty variable warning in Challenge.generate/0  
-- [x] Remove/fix broken test that calls undefined AnubisPlug.hello/0
-- [x] Fix compile-time policy loading issue in AnubisPlug main module
+- [x] Remove/fix broken test that calls undefined Jackal.hello/0
+- [x] Fix compile-time policy loading issue in Jackal main module
 - [x] Add proper configuration setup
 - [x] Add missing cookie/JWT handling for verified clients
 - [x] Implement challenge verification endpoint
@@ -17,7 +17,7 @@
 
 ### Phase 1: Fix Critical Bugs (Steps 1-4) ✅ COMPLETE
 - [x] Fix Challenge module @difficulty bug and variable usage
-- [x] Fix main AnubisPlug module policy loading at compile time
+- [x] Fix main Jackal module policy loading at compile time
 - [x] Replace broken test with proper plug tests
 - [x] Add basic configuration in config.exs
 

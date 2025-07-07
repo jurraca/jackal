@@ -1,4 +1,4 @@
-defmodule AnubisPlug do
+defmodule Jackal do
   import Plug.Conn
 
   def init(opts), do: opts
@@ -12,12 +12,12 @@ defmodule AnubisPlug do
   end
 
   defp check_auth_token(conn) do
-    case AnubisPlug.Auth.get_auth_token(conn) do
+    case Jackal.Auth.get_auth_token(conn) do
       nil ->
         :invalid
 
       token ->
-        case AnubisPlug.Auth.verify_token(token) do
+        case Jackal.Auth.verify_token(token) do
           {:ok, _payload} -> :valid
           {:error, _reason} -> :invalid
         end
@@ -76,7 +76,7 @@ defmodule AnubisPlug do
   end
 
   defp issue_challenge(conn) do
-    {nonce, target, challenge_string} = AnubisPlug.Challenge.generate(conn)
+    {nonce, target, challenge_string} = Jackal.Challenge.generate(conn)
 
     conn
     |> put_resp_content_type("application/json")
@@ -102,13 +102,13 @@ defmodule AnubisPlug do
   defp matches_policy?(user_agent, type) do
     policies = get_policies()
     policy = Map.get(policies, type)
-    AnubisPlug.Policy.match?(policy, user_agent)
+    Jackal.Policy.match?(policy, user_agent)
   end
 
   defp get_policies do
-    case Application.get_env(:anubis_plug, :policies) do
+    case Application.get_env(:jackal, :policies) do
       {module, function} -> apply(module, function, [])
-      _ -> AnubisPlug.DefaultPolicies.all()
+      _ -> Jackal.DefaultPolicies.all()
     end
   end
 end

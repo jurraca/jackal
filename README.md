@@ -1,18 +1,15 @@
-# AnubisPlug Usage Guide
+# Jackal Usage Guide
 
-AnubisPlug is an Elixir port of Anubis that protects your Phoenix/Plug applications from AI crawlers and unwanted bots using proof-of-work challenges.
+Jackal is an Elixir port of [Anubis](https://github.com/TecharoHQ/anubis) that protects your Phoenix/Plug applications from AI crawlers and unwanted bots using proof-of-work challenges.
 
 ## Installation
 
-Add `anubis_plug` to your list of dependencies in `mix.exs`:
+Add `jackal` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:anubis_plug, "~> 0.1.0"},
-    {:plug, "~> 1.14"},
-    {:jason, "~> 1.4"},
-    {:cachex, "~> 3.6"}
+    {:jackal, "~> 0.1.0"}
   ]
 end
 ```
@@ -25,7 +22,7 @@ Add the plug to your endpoint or router:
 
 ```elixir
 # In your endpoint.ex
-plug AnubisPlug
+plug Jackal
 
 # Or in your router.ex
 pipeline :protected do
@@ -35,7 +32,7 @@ pipeline :protected do
   plug :put_root_layout, {MyAppWeb.Layouts, :root}
   plug :protect_from_forgery
   plug :put_secure_browser_headers
-  plug AnubisPlug  # Add this line
+  plug Jackal  # Add this line
 end
 ```
 
@@ -46,7 +43,7 @@ defmodule MyApp.Router do
   use Plug.Router
 
   plug :match
-  plug AnubisPlug  # Add this line
+  plug Jackal  # Add this line
   plug :dispatch
 
   get "/" do
@@ -57,20 +54,19 @@ end
 
 ## Configuration
 
-Configure AnubisPlug in your `config/config.exs`:
+Configure Jackal in your `config/config.exs`:
 
 ```elixir
 import Config
 
-# Configure bot policies
-config :anubis_plug, :policies, {AnubisPlug.DefaultPolicies, :all}
-
-# Configure challenge difficulty (number of leading zeros required)
-config :anubis_plug, :challenge_difficulty, 4
-
-# Configure JWT token settings
-config :anubis_plug, :token_secret, "your-secret-key-change-this-in-production"
-config :anubis_plug, :token_ttl, 24 * 60 * 60  # 24 hours
+config :jackal,
+    # Configure bot policies
+    :policies, {Jackal.DefaultPolicies, :all}
+    # Configure challenge difficulty (number of leading zeros required)
+    :challenge_difficulty, 4
+    # Configure JWT token settings
+    :token_secret, "your-secret-key-change-this-in-production"
+    :token_ttl, 24 * 60 * 60  # 24 hours
 ```
 
 ## Custom Bot Policies
@@ -79,7 +75,7 @@ You can define custom bot policies:
 
 ```elixir
 defmodule MyApp.CustomPolicies do
-  alias AnubisPlug.Policy
+  alias Jackal.Policy
 
   def my_policies do
     %{
@@ -98,12 +94,12 @@ defmodule MyApp.CustomPolicies do
 end
 
 # In config.exs
-config :anubis_plug, :policies, {MyApp.CustomPolicies, :my_policies}
+config :jackal, :policies, {MyApp.CustomPolicies, :my_policies}
 ```
 
 ## How It Works
 
-1. **Request Analysis**: When a request comes in, AnubisPlug checks if the client has a valid authentication token
+1. **Request Analysis**: When a request comes in, Jackal checks if the client has a valid authentication token
 2. **Policy Matching**: If no valid token exists, it analyzes the User-Agent against configured policies
 3. **Action Execution**:
    - **Good bots** (search engines): Allowed through immediately
@@ -161,16 +157,9 @@ Success response:
 
 ## Testing
 
-AnubisPlug includes comprehensive tests. Run them with:
+Jackal includes tests. Run them with:
 
 ```bash
 mix test
 ```
-
-The test suite covers:
-- Good bot allowance
-- Bad bot blocking  
-- Unknown agent challenges
-- Token verification
-- Policy matching
 

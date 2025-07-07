@@ -1,12 +1,12 @@
-defmodule AnubisPlug.Auth do
+defmodule Jackal.Auth do
   @moduledoc """
   Handles JWT token creation and verification for clients who have 
   successfully completed proof-of-work challenges
   """
 
-  @token_secret Application.compile_env(:anubis_plug, :token_secret, "default_secret_change_me")
+  @token_secret Application.compile_env(:jackal, :token_secret, "default_secret_change_me")
   # 1 week (matching original Anubis)
-  @token_ttl Application.compile_env(:anubis_plug, :token_ttl, 7 * 24 * 60 * 60)
+  @token_ttl Application.compile_env(:jackal, :token_ttl, 7 * 24 * 60 * 60)
   @cookie_name "anubis-auth"
 
   def generate_token(client_info \\ %{}, challenge_data \\ %{}) do

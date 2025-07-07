@@ -1,5 +1,5 @@
-defmodule AnubisPlug.DefaultPolicies do
-  alias AnubisPlug.Policy
+defmodule Jackal.DefaultPolicies do
+  alias Jackal.Policy
 
   def good_bots do
     Policy.create(
