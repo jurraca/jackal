@@ -18,7 +18,7 @@ defmodule AnubisPlugTest do
       conn =
         :get
         |> conn("/")
-        |> put_req_header("user-agent", "BadBot")
+        |> put_req_header("user-agent", "Mozilla/5.0 (compatible; BadBot/1.0)")
         |> AnubisPlug.call([])
 
       assert conn.halted
@@ -31,7 +31,7 @@ defmodule AnubisPlugTest do
       conn =
         :get
         |> conn("/")
-        |> put_req_header("user-agent", "UnknownBot")
+        |> put_req_header("user-agent", "Mozilla/5.0 (compatible; UnknownBot/1.0)")
         |> AnubisPlug.call([])
 
       assert conn.halted
@@ -52,6 +52,36 @@ defmodule AnubisPlugTest do
       assert conn.status == 403
       {:ok, response} = Jason.decode(conn.resp_body)
       assert response["status"] == "challenge"
+    end
+
+    test "skips challenges for non-Mozilla user agents" do
+      conn =
+        :get
+        |> conn("/")
+        |> put_req_header("user-agent", "curl/7.68.0")
+        |> AnubisPlug.call([])
+
+      refute conn.halted
+    end
+
+    test "skips challenges for well-known paths" do
+      conn =
+        :get
+        |> conn("/.well-known/security.txt")
+        |> put_req_header("user-agent", "Mozilla/5.0 (compatible; TestBot/1.0)")
+        |> AnubisPlug.call([])
+
+      refute conn.halted
+    end
+
+    test "skips challenges for RSS feeds" do
+      conn =
+        :get
+        |> conn("/feed.rss")
+        |> put_req_header("user-agent", "Mozilla/5.0 (compatible; TestBot/1.0)")
+        |> AnubisPlug.call([])
+
+      refute conn.halted
     end
 
     test "init returns options unchanged" do
