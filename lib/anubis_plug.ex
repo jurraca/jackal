@@ -2,8 +2,7 @@
 defmodule AnubisPlug do
   import Plug.Conn
   
-  @policies (
-    {module, function} = Application.compile_env(:anubis_plug, :policies)
+  # Policies will be loaded at runtime instead of compile time
     apply(module, function, [])
   )
   
@@ -48,7 +47,15 @@ defmodule AnubisPlug do
   end
   
   defp matches_policy?(user_agent, type) do
-    policy = Map.get(@policies, type)
+    policies = get_policies()
+    policy = Map.get(policies, type)
     AnubisPlug.Policy.match?(policy, user_agent)
+  end
+
+  defp get_policies do
+    case Application.get_env(:anubis_plug, :policies) do
+      {module, function} -> apply(module, function, [])
+      _ -> AnubisPlug.DefaultPolicies.get_policies()
+    end
   end
 end
