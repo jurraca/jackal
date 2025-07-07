@@ -5,17 +5,23 @@ defmodule AnubisPlug.Auth do
   """
 
   @token_secret Application.compile_env(:anubis_plug, :token_secret, "default_secret_change_me")
-  # 24 hours
-  @token_ttl Application.compile_env(:anubis_plug, :token_ttl, 24 * 60 * 60)
+  # 1 week (matching original Anubis)
+  @token_ttl Application.compile_env(:anubis_plug, :token_ttl, 7 * 24 * 60 * 60)
+  @cookie_name "anubis-auth"
 
-  def generate_token(client_info \\ %{}) do
+  def generate_token(client_info \\ %{}, challenge_data \\ %{}) do
     now = System.system_time(:second)
 
     payload = %{
       "iat" => now,
+      # Not before: 1 minute prior (original Anubis)
+      "nbf" => now - 60,
       "exp" => now + @token_ttl,
       "verified" => true,
-      "client" => client_info
+      "client" => client_info,
+      "challenge" => Map.get(challenge_data, :challenge_string),
+      "nonce" => Map.get(challenge_data, :nonce),
+      "response" => Map.get(challenge_data, :response_hash)
     }
 
     encode_jwt(payload)
@@ -32,6 +38,9 @@ defmodule AnubisPlug.Auth do
 
           Map.get(payload, "exp", 0) < now ->
             {:error, :expired}
+
+          Map.get(payload, "nbf", 0) > now ->
+            {:error, :not_yet_valid}
 
           true ->
             {:ok, payload}
@@ -53,7 +62,7 @@ defmodule AnubisPlug.Auth do
       same_site: "Lax"
     ]
 
-    Plug.Conn.put_resp_cookie(conn, "anubis_auth", token, cookie_opts)
+    Plug.Conn.put_resp_cookie(conn, @cookie_name, token, cookie_opts)
   end
 
   def get_auth_token(conn) do
@@ -70,11 +79,12 @@ defmodule AnubisPlug.Auth do
             conn
           end
 
-        Map.get(conn.cookies, "anubis_auth", nil)
+        Map.get(conn.cookies, @cookie_name, nil)
     end
   end
 
   # Simple JWT implementation using HMAC-SHA256
+  # In production, consider using a library with ED25519 support
   defp encode_jwt(payload) do
     header = %{"alg" => "HS256", "typ" => "JWT"}
 
