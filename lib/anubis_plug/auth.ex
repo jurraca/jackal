@@ -63,19 +63,15 @@ defmodule AnubisPlug.Auth do
 
       _ ->
         # Safely fetch cookies if not already fetched
-        conn = if conn.cookies == %Plug.Conn.Unfetched{} do
-          Plug.Conn.fetch_cookies(conn)
-        else
-          conn
-        end
-        
-        Map.get(conn.cookies, "anubis_auth")
-    case Plug.Conn.get_req_header(conn, "authorization") do
-      ["Bearer " <> token] ->
-        token
+        conn =
+          if conn.cookies == %Plug.Conn.Unfetched{} do
+            Plug.Conn.fetch_cookies(conn)
+          else
+            conn
+          end
 
-      _ ->
-        conn.req_cookies["anubis_auth"]
+        Map.get(conn.cookies, "anubis_auth") || conn.req_cookies["anubis_auth"]
+    end
   end
 
   # Simple JWT implementation using HMAC-SHA256
