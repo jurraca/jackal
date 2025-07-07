@@ -70,7 +70,7 @@ defmodule AnubisPlug.Auth do
             conn
           end
 
-        Map.get(conn.cookies, "anubis_auth") || conn.req_cookies["anubis_auth"]
+        Map.get(conn.cookies, "anubis_auth", nil)
     end
   end
 
