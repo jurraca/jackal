@@ -53,7 +53,7 @@ defmodule AnubisPlug do
   defp get_policies do
     case Application.get_env(:anubis_plug, :policies) do
       {module, function} -> apply(module, function, [])
-      _ -> AnubisPlug.DefaultPolicies.get_policies()
+      _ -> AnubisPlug.DefaultPolicies.all()
     end
   end
 end
