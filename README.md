@@ -1,44 +1,176 @@
-# README
+# AnubisPlug Usage Guide
 
-A port of Anubis to Elixir.
+AnubisPlug is an Elixir port of Anubis that protects your Phoenix/Plug applications from AI crawlers and unwanted bots using proof-of-work challenges.
 
-Core Components of the Go implementation:
+## Installation
 
-Main Service Components:
-- Server (lib/anubis.go): The core server implementation handling HTTP requests
-- Policy Engine (lib/policy/): Handles bot detection rules and challenge policies
-- Challenge System: Implements proof-of-work verification (web/js/proof-of-work.mjs)
+Add `anubis_plug` to your list of dependencies in `mix.exs`:
 
-Configuration & Rules:
-- Bot Policies (data/bots/): YAML definitions for different bot types
-- Policy Configuration (lib/policy/config/): Policy parsing and validation
-- Environment Configuration (cmd/anubis/main.go): Server settings and flags
+```elixir
+def deps do
+  [
+    {:anubis_plug, "~> 0.1.0"},
+    {:plug, "~> 1.14"},
+    {:jason, "~> 1.4"},
+    {:cachex, "~> 3.6"}
+  ]
+end
+```
 
-Protection Features:
-- DNS Blacklist (internal/dnsbl/): Checks IPs against known bad actors
-- OpenGraph Tags Cache (internal/ogtags/): Caches metadata for allowed bots
-- Decay Map (decaymap/): Time-based cache for temporary data
+## Basic Usage
 
-Frontend Components:
-- Challenge UI (web/): HTML templates and JavaScript for the challenge page
-- Static Assets (web/static/): Images and other static resources
-- CSS Styling (xess/): Custom CSS framework
+### In a Phoenix Application
 
-Key Integrations:
-- Reverse Proxy Support: Works behind Nginx/Apache
-- Cookie-based Authentication: JWT tokens for verified clients
-- Metrics: Prometheus metrics for monitoring
+Add the plug to your endpoint or router:
 
-Flow:
+```elixir
+# In your endpoint.ex
+plug AnubisPlug
 
-Request comes in -> Policy Engine checks rules
-If challenge needed -> Serves challenge page
-Client solves proof-of-work -> Validates solution
-If valid -> Sets cookie and forwards to protected resource
-Future requests with valid cookie -> Direct access
-Design Patterns:
+# Or in your router.ex
+pipeline :protected do
+  plug :accepts, ["html"]
+  plug :fetch_session
+  plug :fetch_live_flash
+  plug :put_root_layout, {MyAppWeb.Layouts, :root}
+  plug :protect_from_forgery
+  plug :put_secure_browser_headers
+  plug AnubisPlug  # Add this line
+end
+```
 
-Configuration as Code (YAML policies)
-Middleware Architecture (HTTP handlers)
-Cache Management (DecayMap)
-Worker System (JavaScript proof-of-work)
+### In a Plug Application
+
+```elixir
+defmodule MyApp.Router do
+  use Plug.Router
+
+  plug :match
+  plug AnubisPlug  # Add this line
+  plug :dispatch
+
+  get "/" do
+    send_resp(conn, 200, "Hello World!")
+  end
+end
+```
+
+## Configuration
+
+Configure AnubisPlug in your `config/config.exs`:
+
+```elixir
+import Config
+
+# Configure bot policies
+config :anubis_plug, :policies, {AnubisPlug.DefaultPolicies, :all}
+
+# Configure challenge difficulty (number of leading zeros required)
+config :anubis_plug, :challenge_difficulty, 4
+
+# Configure JWT token settings
+config :anubis_plug, :token_secret, "your-secret-key-change-this-in-production"
+config :anubis_plug, :token_ttl, 24 * 60 * 60  # 24 hours
+```
+
+## Custom Bot Policies
+
+You can define custom bot policies:
+
+```elixir
+defmodule MyApp.CustomPolicies do
+  alias AnubisPlug.Policy
+
+  def my_policies do
+    %{
+      good: Policy.create(
+        "search_engines",
+        ["googlebot", "bingbot", "duckduckbot"],
+        :allow
+      ),
+      bad: Policy.create(
+        "scrapers",
+        ["scrapy", "curl", "wget", "python-requests"],
+        :block
+      )
+    }
+  end
+end
+
+# In config.exs
+config :anubis_plug, :policies, {MyApp.CustomPolicies, :my_policies}
+```
+
+## How It Works
+
+1. **Request Analysis**: When a request comes in, AnubisPlug checks if the client has a valid authentication token
+2. **Policy Matching**: If no valid token exists, it analyzes the User-Agent against configured policies
+3. **Action Execution**:
+   - **Good bots** (search engines): Allowed through immediately
+   - **Bad bots** (scrapers/crawlers): Blocked with 403 status
+   - **Unknown clients**: Challenged with proof-of-work
+4. **Challenge Resolution**: Unknown clients must solve a computational puzzle
+5. **Token Issuance**: Successful challenge completion results in a JWT token for future requests
+
+## API Endpoints
+
+### Challenge Verification
+
+Clients can POST to `/anubis/verify` with:
+
+```json
+{
+  "nonce": "challenge_nonce_from_initial_response",
+  "solution": "computed_proof_of_work_solution"
+}
+```
+
+Success response:
+```json
+{
+  "status": "verified",
+  "token": "jwt_token_for_future_requests"
+}
+```
+
+## Response Formats
+
+### Challenge Response (403)
+```json
+{
+  "status": "challenge",
+  "nonce": "abc123...",
+  "target": "0000"
+}
+```
+
+### Blocked Response (403)
+```json
+{
+  "status": "denied"
+}
+```
+
+## Production Considerations
+
+1. **Secret Key**: Always use a strong, unique secret key in production
+2. **Difficulty**: Adjust challenge difficulty based on your security needs vs. user experience
+3. **Token TTL**: Configure appropriate token expiration times
+4. **HTTPS**: Use secure cookies in production with HTTPS
+5. **Monitoring**: Monitor challenge completion rates and adjust policies as needed
+
+## Testing
+
+AnubisPlug includes comprehensive tests. Run them with:
+
+```bash
+mix test
+```
+
+The test suite covers:
+- Good bot allowance
+- Bad bot blocking  
+- Unknown agent challenges
+- Token verification
+- Policy matching
+
